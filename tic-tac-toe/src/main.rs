@@ -1,5 +1,5 @@
-const W: usize = 50;
-const H: usize = 20;
+const W: usize = 49;
+const H: usize = 22;
 const KOEF_1: f64 = 0.33;
 const KOEF_2: f64 = 0.66;
 
@@ -11,6 +11,8 @@ fn game() {
     let mut place: [[char;W];H] = [[' '; W]; H];
 
     create_place(&mut place);
+    add_zero(&mut place, 0, 0);
+    add_cross(&mut place, 16, 0);
 
     print_legent(1);
     print_place(place);
@@ -49,6 +51,33 @@ fn print_legent(player: u8) {
     print_mes(&message);
     border();
     println!("");
+}
+
+fn add_zero(place: &mut[[char;W];H], x: usize, y: usize) {
+    let margin_y = (H/3-4)/2+1 as usize;
+    let margin_x = (W/3-7)/2+1 as usize;
+    for i in 0..3 {
+        place[y+margin_y][x+margin_x+2+i]='o';
+    }
+    for i in 0..2 {
+        place[y+margin_y+1+i][x+margin_x]='o';
+        place[y+margin_y+1+i][x+margin_x+6]='o';
+    }
+    for i in 0..3 {
+        place[y+margin_y+3][x+margin_x+2+i]='o';
+    }
+}
+
+fn add_cross(place: &mut[[char;W];H], x: usize, y: usize) {
+    let margin_y = (H/3-4)/2+1 as usize;
+    let margin_x = (W/3-7)/2+1 as usize;
+    for i in 0..7 {
+        place[y+margin_y+1][x+margin_x+i]='▃';
+        place[y+margin_y+1+1][x+margin_x+i]='▀';
+    }
+    for i in 0..4 {
+        place[y+margin_y+i][x+margin_x+2+1]='█';
+    }
 }
 
 fn create_place(place: &mut[[char;W];H]) {
