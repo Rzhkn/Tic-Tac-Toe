@@ -1,3 +1,6 @@
+use std::io;
+
+const WIDTH: usize = 101;
 const W: usize = 49;
 const H: usize = 22;
 const KOEF_1: f64 = 0.33;
@@ -11,36 +14,111 @@ fn game() {
     let mut place: [[char;W];H] = [[' '; W]; H];
 
     create_place(&mut place);
-    add_zero(&mut place, 0, 0);
-    add_cross(&mut place, 16, 0);
+    let mut player: u8 = 1;
 
-    print_legent(1);
-    print_place(place);
+    loop {
+
+        let mut message_error = "";
+        let x: usize;
+        let y: usize;
+        loop {
+            print_legent(player,message_error);
+            print_place(place);
+
+            let mut num = String::new();
+            io::stdin().read_line(&mut num).expect("Ошибка");
+            //let num = num.trim().parse::<i32>().unwrap();
+
+            if num.matches("1").count()>0 {
+                x = 0;
+                y = 0;
+                break;
+            }
+            else if num.matches("2").count()>0 {
+                x = (W as f64 * KOEF_1)as usize;
+                y = 0;
+                break;
+            }
+            else if num.matches("3").count()>0 {
+                x = (W as f64 * KOEF_2)as usize;
+                y = 0;
+                break;
+            }
+            else if num.matches("4").count()>0 {
+                x = 0;
+                y = (H as f64 * KOEF_1)as usize;
+                break;
+            }
+            else if num.matches("5").count()>0 {
+                x = (W as f64 * KOEF_1)as usize;
+                y = (H as f64 * KOEF_1)as usize;
+                break;
+            }
+            else if num.matches("6").count()>0 {
+                x = (W as f64 * KOEF_2)as usize;
+                y = (H as f64 * KOEF_1)as usize;
+                break;
+            }
+            else if num.matches("7").count()>0 {
+                x = 0;
+                y = (H as f64 * KOEF_2)as usize;
+                break;
+            }
+            else if num.matches("8").count()>0 {
+                x = (W as f64 * KOEF_1)as usize;
+                y = (H as f64 * KOEF_2)as usize;
+                break;
+            }
+            else if num.matches("9").count()>0 {
+                x = (W as f64 * KOEF_2)as usize;
+                y = (H as f64 * KOEF_2)as usize;
+                break;
+            }
+            else {
+                message_error = "Введите номер ячейки";
+                continue;
+            }
+        }
+        if player==1 {
+            add_zero(&mut place, x, y);
+            player=2;
+        }
+        else {
+            add_cross(&mut place, x, y);
+            player=1;
+        }
+    }
 }
 
 fn print_place(place: [[char;W];H]) {
     for i in 0..H {
+        for _i in 0..(WIDTH-W)/2 {
+            print!(" ");
+        }
         for j in 0..W {
             print!("{}",place[i][j]);
+        }
+        for _i in 0..(WIDTH-W)/2 {
+            print!(" ");
         }
         println!("");
     }
 }
 
-fn print_legent(player: u8) {
+fn print_legent(player: u8, string: &str) {
     let border = || { 
-        for _i in 0..W {
+        for _i in 0..WIDTH {
             print!("=");
         }
         println!("");
     };
     let print_mes = |mes: &str| {
-        let margin: i32 = ((W - mes.chars().count())/2).try_into().unwrap();
-        for _i in 0..margin {
+        let margin: i32 = ((WIDTH - mes.chars().count())/2).try_into().unwrap();
+        for _i in 1..margin {
             print!(" ");
         }
         print!("{}",mes);
-        for _i in 0..margin {
+        for _i in 1..margin {
             print!(" ");
         }
         println!("");
@@ -49,22 +127,22 @@ fn print_legent(player: u8) {
     border();
     let message = format!("Ходит Игрок №{}",player);
     print_mes(&message);
+    print_mes(string);
     border();
-    println!("");
 }
 
 fn add_zero(place: &mut[[char;W];H], x: usize, y: usize) {
     let margin_y = (H/3-4)/2+1 as usize;
     let margin_x = (W/3-7)/2+1 as usize;
     for i in 0..3 {
-        place[y+margin_y][x+margin_x+2+i]='o';
+        place[y+margin_y][x+margin_x+2+i]='●';
     }
     for i in 0..2 {
-        place[y+margin_y+1+i][x+margin_x]='o';
-        place[y+margin_y+1+i][x+margin_x+6]='o';
+        place[y+margin_y+1+i][x+margin_x]='●';
+        place[y+margin_y+1+i][x+margin_x+6]='●';
     }
     for i in 0..3 {
-        place[y+margin_y+3][x+margin_x+2+i]='o';
+        place[y+margin_y+3][x+margin_x+2+i]='●';
     }
 }
 
@@ -125,4 +203,14 @@ fn create_place(place: &mut[[char;W];H]) {
             
         }
     }
+
+    place[1][1]='1';
+    place[1][set_w1+1]='2';
+    place[1][set_w2+1]='3';
+    place[set_h1+1][1]='4';
+    place[set_h1+1][set_w1+1]='5';
+    place[set_h1+1][set_w2+1]='6';
+    place[set_h2+1][1]='7';
+    place[set_h2+1][set_w1+1]='8';
+    place[set_h2+1][set_w2+1]='9';
 }
