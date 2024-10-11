@@ -2,7 +2,7 @@ use std::io;
 
 const WIDTH: usize = 101;
 const W: usize = 49;
-const H: usize = 22;
+const H: usize = 25;
 const KOEF_1: f64 = 0.33;
 const KOEF_2: f64 = 0.66;
 
@@ -132,30 +132,32 @@ fn print_legent(player: u8, string: &str) {
 }
 
 fn add_zero(place: &mut[[char;W];H], x: usize, y: usize) {
-    let margin_y = (H/3-4)/2+1 as usize;
+    let margin_y = (H/3-5)/2+1 as usize;
     let margin_x = (W/3-7)/2+1 as usize;
     for i in 0..3 {
         place[y+margin_y][x+margin_x+2+i]='●';
     }
-    for i in 0..2 {
+    for i in 0..3 {
         place[y+margin_y+1+i][x+margin_x]='●';
         place[y+margin_y+1+i][x+margin_x+6]='●';
     }
     for i in 0..3 {
-        place[y+margin_y+3][x+margin_x+2+i]='●';
+        place[y+margin_y+4][x+margin_x+2+i]='●';
     }
 }
 
 fn add_cross(place: &mut[[char;W];H], x: usize, y: usize) {
-    let margin_y = (H/3-4)/2+1 as usize;
+    let margin_y = (H/3-5)/2+1 as usize;
     let margin_x = (W/3-7)/2+1 as usize;
-    for i in 0..7 {
-        place[y+margin_y+1][x+margin_x+i]='▃';
-        place[y+margin_y+1+1][x+margin_x+i]='▀';
-    }
-    for i in 0..4 {
-        place[y+margin_y+i][x+margin_x+2+1]='█';
-    }
+    place[y+margin_y][x+margin_x]='X';
+    place[y+margin_y][x+margin_x+6]='X';
+    place[y+margin_y+1][x+margin_x+2]='X';
+    place[y+margin_y+1][x+margin_x+4]='X';
+    place[y+margin_y+2][x+margin_x+3]='X';
+    place[y+margin_y+3][x+margin_x+2]='X';
+    place[y+margin_y+3][x+margin_x+4]='X';
+    place[y+margin_y+4][x+margin_x]='X';
+    place[y+margin_y+4][x+margin_x+6]='X';
 }
 
 fn create_place(place: &mut[[char;W];H]) {
