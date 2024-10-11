@@ -8,86 +8,43 @@ const KOEF_2: f64 = 0.66;
 
 fn main() {
     game();
+
+    println!("Для завершения программы нажмите на любую кнопку: ");
+    io::stdin().read_line(&mut String::new()).expect("Ошибка");
 }
 
 fn game() {
     let mut place: [[char;W];H] = [[' '; W]; H];
+    let mut place_2: [[u8;W];H] = [[0; W]; H];
 
     create_place(&mut place);
     let mut player: u8 = 1;
 
     loop {
+        let mut x: usize = 0;
+        let mut y: usize = 0;
+        
+        new_coordinates(&mut x, &mut y, player, &mut place, &mut place_2);
 
-        let mut message_error = "";
-        let x: usize;
-        let y: usize;
-        loop {
-            print_legent(player,message_error);
-            print_place(place);
-
-            let mut num = String::new();
-            io::stdin().read_line(&mut num).expect("Ошибка");
-            //let num = num.trim().parse::<i32>().unwrap();
-
-            if num.matches("1").count()>0 {
-                x = 0;
-                y = 0;
-                break;
-            }
-            else if num.matches("2").count()>0 {
-                x = (W as f64 * KOEF_1)as usize;
-                y = 0;
-                break;
-            }
-            else if num.matches("3").count()>0 {
-                x = (W as f64 * KOEF_2)as usize;
-                y = 0;
-                break;
-            }
-            else if num.matches("4").count()>0 {
-                x = 0;
-                y = (H as f64 * KOEF_1)as usize;
-                break;
-            }
-            else if num.matches("5").count()>0 {
-                x = (W as f64 * KOEF_1)as usize;
-                y = (H as f64 * KOEF_1)as usize;
-                break;
-            }
-            else if num.matches("6").count()>0 {
-                x = (W as f64 * KOEF_2)as usize;
-                y = (H as f64 * KOEF_1)as usize;
-                break;
-            }
-            else if num.matches("7").count()>0 {
-                x = 0;
-                y = (H as f64 * KOEF_2)as usize;
-                break;
-            }
-            else if num.matches("8").count()>0 {
-                x = (W as f64 * KOEF_1)as usize;
-                y = (H as f64 * KOEF_2)as usize;
-                break;
-            }
-            else if num.matches("9").count()>0 {
-                x = (W as f64 * KOEF_2)as usize;
-                y = (H as f64 * KOEF_2)as usize;
-                break;
-            }
-            else {
-                message_error = "Введите номер ячейки";
-                continue;
-            }
-        }
         if player==1 {
             add_zero(&mut place, x, y);
+            if winner_1(&place_2)==1 {
+                println!("Победил Игрок №1!");
+                break;
+            }
             player=2;
         }
         else {
             add_cross(&mut place, x, y);
+            if winner_2(&place_2)==1 {
+                println!("Победил Игрок №2!");
+                break;
+            }
             player=1;
         }
     }
+
+    print_place(place);
 }
 
 fn print_place(place: [[char;W];H]) {
@@ -158,6 +115,168 @@ fn add_cross(place: &mut[[char;W];H], x: usize, y: usize) {
     place[y+margin_y+3][x+margin_x+4]='X';
     place[y+margin_y+4][x+margin_x]='X';
     place[y+margin_y+4][x+margin_x+6]='X';
+}
+
+fn winner_1 (place: &[[u8;W];H]) -> u8 {
+    let mut f: u8 = 0;
+    if place[0][0]==1 && place[0][1]==1 && place[0][2]==1 ||
+        place[1][0]==1 && place[1][1]==1 && place[1][2]==1 ||
+        place[2][0]==1 && place[2][1]==1 && place[2][2]==1 ||
+        place[0][0]==1 && place[1][0]==1 && place[2][0]==1 ||
+        place[0][1]==1 && place[1][1]==1 && place[2][1]==1 ||
+        place[0][2]==1 && place[1][2]==1 && place[2][2]==1 ||
+        place[1][1]==1 && (place[0][0]==1 &&  place[2][2]==1 || place[0][2]==1 && place[2][0]==1) {
+            f=1;
+        }
+    f
+}
+
+fn winner_2 (place: &[[u8;W];H]) -> u8 {
+    let mut f: u8 = 0;
+    if place[0][0]==2 && place[0][1]==2 && place[0][2]==2 ||
+        place[1][0]==2 && place[1][1]==2 && place[1][2]==2 ||
+        place[2][0]==2 && place[2][1]==2 && place[2][2]==2 ||
+        place[0][0]==2 && place[1][0]==2 && place[2][0]==2 ||
+        place[0][1]==2 && place[1][1]==2 && place[2][1]==2 ||
+        place[0][2]==2 && place[1][2]==2 && place[2][2]==2 ||
+        place[1][1]==2 && (place[0][0]==2 &&  place[2][2]==2 || place[0][2]==2 && place[2][0]==2) {
+            f=1;
+        }
+    f
+}
+
+fn new_coordinates(x: &mut usize, y: &mut usize, player: u8, place: &mut[[char;W];H], place_2: &mut[[u8;W];H]) {
+    let add_hod = |player: u8, place_2: &mut[[u8;W];H], x: usize, y: usize| {
+        if player==1 {
+            place_2[x][y]=1;
+        }
+        else {
+            place_2[x][y]=2;
+        }
+    };
+
+    let mut message_error = "";
+    loop {
+        print_legent(player,message_error);
+        print_place(*place);
+
+        let mut num = String::new();
+        io::stdin().read_line(&mut num).expect("Ошибка");
+        //let num = num.trim().parse::<i32>().unwrap();
+
+        if num.matches("1").count()>0 {
+            if place_2[0][0]==0 {
+                *x = 0;
+                *y = 0;
+                add_hod(player, place_2, 0, 0);
+                break;
+            }
+            else {
+                message_error = "Ячейка занята, введите другой номер";
+                continue;
+            }
+        }
+        else if num.matches("2").count()>0{
+            if place_2[0][1]==0 {
+                *x = (W as f64 * KOEF_1)as usize;
+                *y = 0;
+                add_hod(player, place_2, 0, 1);
+                break;
+            }
+            else {
+                message_error = "Ячейка занята, введите другой номер";
+                continue;
+            }
+        }
+        else if num.matches("3").count()>0 {
+            if place_2[0][2]==0 {
+                *x = (W as f64 * KOEF_2)as usize;
+                *y = 0;
+                add_hod(player, place_2, 0, 2);
+                break;
+            }
+            else {
+                message_error = "Ячейка занята, введите другой номер";
+                continue;
+            }
+        }
+        else if num.matches("4").count()>0 {
+            if place_2[1][0]==0 {
+                *x = 0;
+                *y = (H as f64 * KOEF_1)as usize;
+                add_hod(player, place_2, 1, 0);
+                break;
+            }
+            else {
+                message_error = "Ячейка занята, введите другой номер";
+                continue;
+            }
+        }
+        else if num.matches("5").count()>0 {
+            if place_2[1][1]==0 {
+                *x = (W as f64 * KOEF_1)as usize;
+                *y = (H as f64 * KOEF_1)as usize;
+                add_hod(player, place_2, 1, 1);
+                break;
+            }
+            else {
+                message_error = "Ячейка занята, введите другой номер";
+                continue;
+            }
+        }
+        else if num.matches("6").count()>0 {
+            if place_2[1][2]==0 {
+                *x = (W as f64 * KOEF_2)as usize;
+                *y = (H as f64 * KOEF_1)as usize;
+                add_hod(player, place_2, 1, 2);
+                break;
+            }
+            else {
+                message_error = "Ячейка занята, введите другой номер";
+                continue;
+            }
+        }
+        else if num.matches("7").count()>0 {
+            if place_2[2][0]==0 {
+                *x = 0;
+                *y = (H as f64 * KOEF_2)as usize;
+                add_hod(player, place_2, 2, 0);
+                break;
+            }
+            else {
+                message_error = "Ячейка занята, введите другой номер";
+                continue;
+            }
+        }
+        else if num.matches("8").count()>0 {
+            if place_2[2][1]==0 {
+                *x = (W as f64 * KOEF_1)as usize;
+                *y = (H as f64 * KOEF_2)as usize;
+                add_hod(player, place_2, 2, 1);
+                break;
+            }
+            else {
+                message_error = "Ячейка занята, введите другой номер";
+                continue;
+            }
+        }
+        else if num.matches("9").count()>0 {
+            if place_2[2][2]==0 {
+                *x = (W as f64 * KOEF_2)as usize;
+                *y = (H as f64 * KOEF_2)as usize;
+                add_hod(player,place_2, 2, 2);
+                break;
+            }
+            else {
+                message_error = "Ячейка занята, введите другой номер";
+                continue;
+            }
+        }
+        else {
+            message_error = "Введите номер ячейки";
+            continue;
+        }
+    }
 }
 
 fn create_place(place: &mut[[char;W];H]) {
