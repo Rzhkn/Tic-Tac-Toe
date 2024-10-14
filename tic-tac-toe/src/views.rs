@@ -4,6 +4,48 @@ const H: usize = 25;
 const KOEF_1: f64 = 0.33;
 const KOEF_2: f64 = 0.66;
 
+fn border() { 
+    for _i in 0..WIDTH {
+        print!("=");
+    }
+    println!("");
+}
+
+fn print_mes(mes: &str) {
+    let margin: i32 = ((WIDTH - mes.chars().count())/2).try_into().unwrap();
+    for _i in 1..margin {
+        print!(" ");
+    }
+    print!("{}",mes);
+    for _i in 1..margin {
+        print!(" ");
+    }
+    println!("");
+}
+
+pub fn print_start(message_error: &str) {
+    border();
+    print_mes("Выберите режим игры:");
+    print_mes("1 - с ботом          2 - с другом");
+    print_mes(message_error);
+    border();
+    println!("");
+}
+
+pub fn print_legent(player: u8, string: &str, finish: u8) {
+    border();
+    if finish==0 {
+        let message = format!("Ходит Игрок №{}",player);
+        print_mes(&message);
+        print_mes(string);
+    } else if finish==1 || finish==2 {
+        print_mes(&format!("Победил Игрок №{}!",finish));
+    } else{
+        print_mes("Победила дружба!");
+    }
+    border();
+}
+
 pub fn print_place(place: [[char;W];H]) {
     for i in 0..H {
         for _i in 0..(WIDTH-W)/2 {
@@ -17,38 +59,6 @@ pub fn print_place(place: [[char;W];H]) {
         }
         println!("");
     }
-}
-
-pub fn print_legent(player: u8, string: &str, finish: u8) {
-    let border = || { 
-        for _i in 0..WIDTH {
-            print!("=");
-        }
-        println!("");
-    };
-    let print_mes = |mes: &str| {
-        let margin: i32 = ((WIDTH - mes.chars().count())/2).try_into().unwrap();
-        for _i in 1..margin {
-            print!(" ");
-        }
-        print!("{}",mes);
-        for _i in 1..margin {
-            print!(" ");
-        }
-        println!("");
-    };
-
-    border();
-    if finish==0 {
-        let message = format!("Ходит Игрок №{}",player);
-        print_mes(&message);
-        print_mes(string);
-    } else if finish==1 || finish==2 {
-        print_mes(&format!("Победил Игрок №{}!",finish));
-    } else{
-        print_mes("Победила дружба!");
-    }
-    border();
 }
 
 pub fn create_place(place: &mut[[char;W];H]) {
